@@ -9,20 +9,20 @@
 #include <random>
 #include <utility>
 
-//! An adapter class that adds random dropping behavior to an FD adapter
+
 template<typename AdapterT>
 class LossyFdAdapter
 {
 private:
-  //! Fast RNG used by _should_drop()
+
   std::default_random_engine _rand { get_random_engine() };
 
-  //! The underlying FD adapter
+
   AdapterT _adapter;
 
-  //! \brief Determine whether or not to drop a given read or write
-  //! \param[in] uplink is `true` to use the uplink loss probability, else use the downlink loss probability
-  //! \returns `true` if the segment should be dropped
+
+
+
   bool _should_drop( bool uplink )
   {
     const auto& cfg = _adapter.config();
@@ -31,15 +31,15 @@ private:
   }
 
 public:
-  //! Conversion to a FileDescriptor by returning the underlying AdapterT
+
   FileDescriptor& fd() { return _adapter.fd(); }
 
-  //! Construct from a FileDescriptor appropriate to the AdapterT constructor
+
   explicit LossyFdAdapter( AdapterT&& adapter ) : _adapter( std::move( adapter ) ) {}
 
-  //! \brief Read from the underlying AdapterT instance, potentially dropping the read datagram
-  //! \returns std::optional<TCPSegment> that is empty if the segment was dropped or if
-  //!          the underlying AdapterT returned an empty value
+
+
+
   std::optional<TCPMessage> read()
   {
     auto ret = _adapter.read();
@@ -49,8 +49,8 @@ public:
     return ret;
   }
 
-  //! \brief Write to the underlying AdapterT instance, potentially dropping the datagram to be written
-  //! \param[in] seg is the packet to either write or drop
+
+
   void write( const TCPMessage& seg )
   {
     if ( _should_drop( true ) ) {
@@ -59,11 +59,11 @@ public:
     return _adapter.write( seg );
   }
 
-  //! \name
-  //! Passthrough functions to the underlying AdapterT instance
 
-  void set_listening( const bool l ) { _adapter.set_listening( l ); } //!< FdAdapterBase::set_listening passthrough
-  const FdAdapterConfig& config() const { return _adapter.config(); } //!< FdAdapterBase::config passthrough
-  FdAdapterConfig& config_mut() { return _adapter.config_mut(); }     //!< FdAdapterBase::config_mut passthrough
+
+
+  void set_listening( const bool l ) { _adapter.set_listening( l ); }
+  const FdAdapterConfig& config() const { return _adapter.config(); }
+  FdAdapterConfig& config_mut() { return _adapter.config_mut(); }
   void tick( const size_t ms_since_last_tick ) { _adapter.tick( ms_since_last_tick ); }
 };

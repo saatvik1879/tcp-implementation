@@ -90,7 +90,7 @@ void do_test_2( const TCPConfig& cfg, default_random_engine& rd )
     if ( off + 1 <= min_expect_ackno && off + sz + 1 > min_expect_ackno ) {
       min_expect_ackno = sz + off;
     }
-    max_expect_ackno = max_expect_ackno + sz; // really loose because of overlap
+    max_expect_ackno = max_expect_ackno + sz;
     test_2.execute( ExpectAcknoBetween { rx_isn, off, min_expect_ackno, max_expect_ackno } );
   }
 
@@ -105,12 +105,12 @@ int main()
     cfg.recv_capacity = 65000;
     auto rd = get_random_engine();
 
-    // non-overlapping out-of-order segments
+
     for ( unsigned rep_no = 0; rep_no < NREPS; ++rep_no ) {
       do_test_1( cfg, rd );
     }
 
-    // overlapping out-of-order segments
+
     for ( unsigned rep_no = 0; rep_no < NREPS; ++rep_no ) {
       do_test_2( cfg, rd );
     }

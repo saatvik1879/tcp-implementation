@@ -17,5 +17,5 @@ optional<TCPMessage> TCPOverIPv4OverTunFdAdapter::read()
   return {};
 }
 
-//! Specialize LossyFdAdapter to TCPOverIPv4OverTunFdAdapter
+
 template class LossyFdAdapter<TCPOverIPv4OverTunFdAdapter>;

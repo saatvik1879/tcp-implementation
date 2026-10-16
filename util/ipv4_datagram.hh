@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-//! \brief [IPv4](\ref rfc::rfc791) Internet datagram
+
 struct IPv4Datagram
 {
   IPv4Header header {};

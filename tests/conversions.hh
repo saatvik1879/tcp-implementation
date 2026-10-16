@@ -6,7 +6,7 @@
 #include <string>
 #include <utility>
 
-// https://stackoverflow.com/questions/33399594/making-a-user-defined-class-stdto-stringable
+
 
 namespace minnow_conversions {
 using std::to_string;
@@ -31,7 +31,7 @@ std::string to_string( const std::optional<T>& v )
 
   return "None";
 }
-} // namespace minnow_conversions
+}
 
 template<typename T>
 concept MinnowStringable = requires( T t )

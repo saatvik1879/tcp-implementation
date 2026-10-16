@@ -29,7 +29,7 @@ int main()
     uniform_int_distribution<uint32_t> dist31minus1 { 0, ( uint32_t { 1 } << 31 ) - 1 };
     uniform_int_distribution<uint32_t> dist32 { 0, numeric_limits<uint32_t>::max() };
     const uint64_t big_offset = ( uint64_t { 1 } << 31 ) - 1;
-    // credit: Ammar Ratnani
+
     uniform_int_distribution<uint64_t> dist63 { big_offset, uint64_t { 1 } << 63 };
 
     for ( unsigned int i = 0; i < 1000000; i++ ) {

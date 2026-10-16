@@ -13,11 +13,11 @@
 using namespace std;
 using namespace std::chrono;
 
-void speed_test( const size_t num_chunks,   // NOLINT(bugprone-easily-swappable-parameters)
-                 const size_t capacity,     // NOLINT(bugprone-easily-swappable-parameters)
-                 const size_t random_seed ) // NOLINT(bugprone-easily-swappable-parameters)
+void speed_test( const size_t num_chunks,
+                 const size_t capacity,
+                 const size_t random_seed )
 {
-  // Generate the data to be written
+
   const string data = [&] {
     default_random_engine rd { random_seed };
     uniform_int_distribution<char> ud;
@@ -28,7 +28,7 @@ void speed_test( const size_t num_chunks,   // NOLINT(bugprone-easily-swappable-
     return ret;
   }();
 
-  // Split the data into segments before writing
+
   queue<tuple<uint64_t, string, bool>> split_data;
   for ( size_t i = 0; i < data.size(); i += capacity ) {
     split_data.emplace( i + 2, data.substr( i + 2, capacity * 2 ), i + 2 + capacity * 2 >= data.size() );

@@ -19,7 +19,7 @@ int main()
   try {
     auto rd = get_random_engine();
 
-    // overlapping segments
+
     for ( unsigned rep_no = 0; rep_no < NREPS; ++rep_no ) {
       ReassemblerTestHarness sr { "win test " + to_string( rep_no ), NSEGS * MAX_SEG_LEN };
 

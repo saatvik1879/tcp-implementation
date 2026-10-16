@@ -4,13 +4,13 @@
 
 #include <cstddef>
 
-static constexpr uint32_t TCPHeaderMinLen = 5; // 32-bit words
+static constexpr uint32_t TCPHeaderMinLen = 5;
 
 using namespace std;
 
 void TCPSegment::parse( Parser& parser, uint32_t datagram_layer_pseudo_checksum )
 {
-  /* verify checksum */
+
   InternetChecksum check { datagram_layer_pseudo_checksum };
   check.add( parser.buffer() );
   if ( check.value() ) {
@@ -34,9 +34,9 @@ void TCPSegment::parse( Parser& parser, uint32_t datagram_layer_pseudo_checksum 
   parser.integer( octet );
   const uint8_t data_offset = octet >> 4;
 
-  parser.integer( octet ); // flags
+  parser.integer( octet );
   if ( not( octet & 0b0001'0000 ) ) {
-    message.receiver.ackno.reset(); // no ACK
+    message.receiver.ackno.reset();
   }
 
   message.sender.RST = message.receiver.RST = octet & 0b0000'0100;
@@ -45,9 +45,9 @@ void TCPSegment::parse( Parser& parser, uint32_t datagram_layer_pseudo_checksum 
 
   parser.integer( message.receiver.window_size );
   parser.integer( udinfo.cksum );
-  parser.integer( raw16 ); // urgent pointer
+  parser.integer( raw16 );
 
-  // skip any options or anything extra in the header
+
   if ( data_offset < TCPHeaderMinLen ) {
     parser.set_error();
   }
@@ -68,14 +68,14 @@ void TCPSegment::serialize( Serializer& serializer ) const
   serializer.integer( udinfo.dst_port );
   serializer.integer( Wrap32Serializable { message.sender.seqno }.raw_value() );
   serializer.integer( Wrap32Serializable { message.receiver.ackno.value_or( Wrap32 { 0 } ) }.raw_value() );
-  serializer.integer( uint8_t { TCPHeaderMinLen << 4 } ); // data offset
+  serializer.integer( uint8_t { TCPHeaderMinLen << 4 } );
   const bool reset = message.sender.RST or message.receiver.RST;
   const uint8_t flags = ( message.receiver.ackno.has_value() ? 0b0001'0000U : 0 ) | ( reset ? 0b0000'0100U : 0 )
                         | ( message.sender.SYN ? 0b0000'0010U : 0 ) | ( message.sender.FIN ? 0b0000'0001U : 0 );
   serializer.integer( flags );
   serializer.integer( message.receiver.window_size );
   serializer.integer( udinfo.cksum );
-  serializer.integer( uint16_t { 0 } ); // urgent pointer
+  serializer.integer( uint16_t { 0 } );
   serializer.buffer( message.sender.payload );
 }
 

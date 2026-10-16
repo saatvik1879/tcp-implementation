@@ -5,9 +5,9 @@
 
 using namespace std;
 
-void stress_test( const size_t input_len,    // NOLINT(bugprone-easily-swappable-parameters)
-                  const size_t capacity,     // NOLINT(bugprone-easily-swappable-parameters)
-                  const size_t random_seed ) // NOLINT(bugprone-easily-swappable-parameters)
+void stress_test( const size_t input_len,
+                  const size_t capacity,
+                  const size_t random_seed )
 {
   default_random_engine rd { random_seed };
 
@@ -32,7 +32,7 @@ void stress_test( const size_t input_len,    // NOLINT(bugprone-easily-swappable
     bs.execute( AvailableCapacity { expected_available_capacity } );
     bs.execute( BytesBuffered { expected_bytes_pushed - expected_bytes_popped } );
 
-    /* write something */
+
     uniform_int_distribution<size_t> bytes_to_push_dist { 0, data.size() - expected_bytes_pushed };
     const size_t amount_to_push = bytes_to_push_dist( rd );
     bs.execute( Push { data.substr( expected_bytes_pushed, amount_to_push ) } );
@@ -46,7 +46,7 @@ void stress_test( const size_t input_len,    // NOLINT(bugprone-easily-swappable
       bs.execute( Close {} );
     }
 
-    /* read something */
+
     const size_t peek_size = bs.peek_size();
     if ( ( expected_bytes_pushed != expected_bytes_popped ) and peek_size == 0 ) {
       throw runtime_error( "ByteStream::reader().peek() returned empty view" );

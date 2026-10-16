@@ -35,7 +35,7 @@ int main()
       test.execute( ExpectMessage {}.with_no_flags().with_syn( true ).with_payload_size( 0 ).with_seqno( isn ) );
       test.execute( ExpectSeqno { isn + 1 } );
       test.execute( ExpectSeqnosInFlight { 1 } );
-      // Wait twice as long b/c exponential back-off
+
       test.execute( Tick { 2 * retx_timeout - 1U } );
       test.execute( ExpectNoSegment {} );
       test.execute( Tick { 1 } );
@@ -113,7 +113,7 @@ int main()
       test.execute( Tick { 1 }.with_max_retx_exceeded( true ) );
     }
 
-    // test credit: Cooper de Nicola
+
     {
       TCPConfig cfg;
       const Wrap32 isn( rd() );
@@ -121,9 +121,9 @@ int main()
       cfg.isn = isn;
       cfg.rt_timeout = retx_timeout;
 
-      // test that lowest seqno is sent on consecutive resends
+
       TCPSenderTestHarness test { "Retx after multiple sends, retx earliest packet", cfg };
-      // syn + syn/ack to increase window size
+
       test.execute( Push {} );
       test.execute( ExpectMessage {}.with_no_flags().with_syn( true ).with_payload_size( 0 ).with_seqno( isn ) );
       test.execute( ExpectNoSegment {} );
@@ -131,45 +131,45 @@ int main()
       test.execute( AckReceived { Wrap32 { isn + 1 } } );
       test.execute( ExpectSeqnosInFlight { 0 } );
 
-      // segment A. Send
+
       test.execute( Push { "A" } );
       test.execute( ExpectMessage {}.with_payload_size( 1 ).with_seqno( isn + 1 ) );
       test.execute( ExpectNoSegment {} );
       test.execute( ExpectSeqnosInFlight { 1 } );
 
-      // segment B. Queue.
+
       test.execute( Push { "BB" } );
       test.execute( ExpectSeqnosInFlight { 3 } );
 
-      // timeout to queue A. Should send packet A and B, order does not matter
+
       test.execute( Tick { retx_timeout }.with_max_retx_exceeded( false ) );
-      test.execute( ExpectMessage {} ); // either A or B
-      test.execute( ExpectMessage {} ); // either A or B
+      test.execute( ExpectMessage {} );
+      test.execute( ExpectMessage {} );
       test.execute( ExpectNoSegment {} );
       test.execute( ExpectSeqnosInFlight { 3 } );
       test.execute( ExpectConsecutiveRetransmissions { 1 } );
 
-      // timeout. Should send segment A
+
       test.execute( Tick { static_cast<uint64_t>( retx_timeout ) << 1 }.with_max_retx_exceeded( false ) );
       test.execute( ExpectMessage {}.with_payload_size( 1 ).with_seqno( isn + 1 ) );
       test.execute( ExpectNoSegment {} );
       test.execute( ExpectSeqnosInFlight { 3 } );
       test.execute( ExpectConsecutiveRetransmissions { 2 } );
 
-      // continue communications as expected
-      test.execute( AckReceived { Wrap32 { isn + 1 + 1 } } ); // ack A
+
+      test.execute( AckReceived { Wrap32 { isn + 1 + 1 } } );
       test.execute( ExpectSeqnosInFlight { 2 } );
-      test.execute( ExpectConsecutiveRetransmissions { 0 } ); // B is still outstanding
+      test.execute( ExpectConsecutiveRetransmissions { 0 } );
       test.execute( Tick { static_cast<uint64_t>( retx_timeout ) }.with_max_retx_exceeded( false ) );
-      test.execute( ExpectMessage {}.with_payload_size( 2 ).with_seqno( isn + 1 + 1 ) ); // packet B
+      test.execute( ExpectMessage {}.with_payload_size( 2 ).with_seqno( isn + 1 + 1 ) );
       test.execute( ExpectNoSegment {} );
       test.execute( ExpectConsecutiveRetransmissions { 1 } );
-      test.execute( AckReceived { Wrap32 { isn + 1 + 1 + 2 } } ); // ack B
+      test.execute( AckReceived { Wrap32 { isn + 1 + 1 + 2 } } );
       test.execute( ExpectSeqnosInFlight { 0 } );
       test.execute( ExpectNoSegment {} );
     }
 
-    // test credit: Kosthi
+
     {
       TCPConfig cfg;
       const Wrap32 isn( rd() );
@@ -189,7 +189,7 @@ int main()
       test.execute( ExpectSeqnosInFlight { 0 } );
       test.execute( Push { "a" } );
       test.execute( ExpectMessage {}.with_no_flags().with_data( "a" ) );
-      test.execute( Tick( 1 ) ); // no timeout, no msg send
+      test.execute( Tick( 1 ) );
       test.execute( ExpectNoSegment {} );
       test.execute( ExpectSeqnosInFlight { 1 } );
       test.execute( Tick( retx_timeout - 1U ) );

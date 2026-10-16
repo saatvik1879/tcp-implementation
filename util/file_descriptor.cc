@@ -36,15 +36,15 @@ T FileDescriptor::CheckSystemCall( std::string_view s_attempt, T return_value ) 
   return internal_fd_->CheckSystemCall( s_attempt, return_value );
 }
 
-// fd is the file descriptor number returned by [open(2)](\ref man2::open) or similar
+
 FileDescriptor::FDWrapper::FDWrapper( int fd ) : fd_( fd )
 {
   if ( fd < 0 ) {
     throw runtime_error( "invalid fd number:" + to_string( fd ) );
   }
 
-  const int flags = CheckSystemCall( "fcntl", fcntl( fd, F_GETFL ) ); // NOLINT(*-vararg)
-  non_blocking_ = flags & O_NONBLOCK;                                 // NOLINT(*-bitwise)
+  const int flags = CheckSystemCall( "fcntl", fcntl( fd, F_GETFL ) );
+  non_blocking_ = flags & O_NONBLOCK;
 }
 
 void FileDescriptor::FDWrapper::close()
@@ -61,25 +61,25 @@ FileDescriptor::FDWrapper::~FDWrapper()
     }
     close();
   } catch ( const exception& e ) {
-    // don't throw an exception from the destructor
+
     cerr << "Exception destructing FDWrapper: " << e.what() << endl;
   }
 }
 
-// fd is the file descriptor number returned by [open(2)](\ref man2::open) or similar
+
 FileDescriptor::FileDescriptor( int fd ) : internal_fd_( make_shared<FDWrapper>( fd ) ) {}
 
-// Private constructor used by duplicate()
+
 FileDescriptor::FileDescriptor( shared_ptr<FDWrapper> other_shared_ptr ) : internal_fd_( move( other_shared_ptr ) )
 {}
 
-// returns a copy of this FileDescriptor
+
 FileDescriptor FileDescriptor::duplicate() const
 {
   return FileDescriptor { internal_fd_ };
 }
 
-// buffer is the string to be read into
+
 void FileDescriptor::read( string& buffer )
 {
   if ( buffer.empty() ) {
@@ -121,7 +121,7 @@ void FileDescriptor::read( vector<string>& buffers )
   iovecs.reserve( buffers.size() );
   size_t total_size = 0;
   for ( const auto& x : buffers ) {
-    iovecs.push_back( { const_cast<char*>( x.data() ), x.size() } ); // NOLINT(*-const-cast)
+    iovecs.push_back( { const_cast<char*>( x.data() ), x.size() } );
     total_size += x.size();
   }
 
@@ -172,7 +172,7 @@ size_t FileDescriptor::write( const vector<string_view>& buffers )
   iovecs.reserve( buffers.size() );
   size_t total_size = 0;
   for ( const auto x : buffers ) {
-    iovecs.push_back( { const_cast<char*>( x.data() ), x.size() } ); // NOLINT(*-const-cast)
+    iovecs.push_back( { const_cast<char*>( x.data() ), x.size() } );
     total_size += x.size();
   }
 
@@ -193,14 +193,14 @@ size_t FileDescriptor::write( const vector<string_view>& buffers )
 
 void FileDescriptor::set_blocking( bool blocking )
 {
-  int flags = CheckSystemCall( "fcntl", fcntl( fd_num(), F_GETFL ) ); // NOLINT(*-vararg)
+  int flags = CheckSystemCall( "fcntl", fcntl( fd_num(), F_GETFL ) );
   if ( blocking ) {
-    flags ^= ( flags & O_NONBLOCK ); // NOLINT(*-bitwise)
+    flags ^= ( flags & O_NONBLOCK );
   } else {
-    flags |= O_NONBLOCK; // NOLINT(*-bitwise)
+    flags |= O_NONBLOCK;
   }
 
-  CheckSystemCall( "fcntl", fcntl( fd_num(), F_SETFL, flags ) ); // NOLINT(*-vararg)
+  CheckSystemCall( "fcntl", fcntl( fd_num(), F_SETFL, flags ) );
 
   internal_fd_->non_blocking_ = not blocking;
 }

@@ -14,9 +14,9 @@ EthernetAddress random_host_ethernet_address()
 {
   EthernetAddress addr;
   for ( auto& byte : addr ) {
-    byte = random_device()(); // use a random local Ethernet address
+    byte = random_device()();
   }
-  addr.at( 0 ) |= 0x02; // "10" in last two binary digits marks a private Ethernet address
+  addr.at( 0 ) |= 0x02;
   addr.at( 0 ) &= 0xfe;
 
   return addr;
@@ -26,9 +26,9 @@ EthernetAddress random_router_ethernet_address()
 {
   EthernetAddress addr;
   for ( auto& byte : addr ) {
-    byte = random_device()(); // use a random local Ethernet address
+    byte = random_device()();
   }
-  addr.at( 0 ) = 0x02; // "10" in last two binary digits marks a private Ethernet address
+  addr.at( 0 ) = 0x02;
   addr.at( 1 ) = 0;
   addr.at( 2 ) = 0;
 
@@ -85,7 +85,7 @@ class Host
   }
 
 public:
-  // NOLINTNEXTLINE(*-easily-swappable-*)
+
   Host( string name, const Address& my_address, const Address& next_hop, shared_ptr<NetworkSegment> network )
     : _name( std::move( name ) )
     , _my_address( my_address )

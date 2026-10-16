@@ -9,7 +9,7 @@ int main()
 {
   try {
     {
-      // Overlapping assembled (unread) section
+
       const size_t cap = { 1000 };
       ReassemblerTestHarness test { "overlapping assembled/unread section", cap };
 
@@ -21,7 +21,7 @@ int main()
     }
 
     {
-      // Overlapping assembled (read) section
+
       const size_t cap = { 1000 };
       ReassemblerTestHarness test { "overlapping assembled/read section", cap };
 
@@ -34,7 +34,7 @@ int main()
     }
 
     {
-      // Overlapping unassembled section, resulting in assembly
+
       const size_t cap = { 1000 };
       ReassemblerTestHarness test { "overlapping unassembled section to fill hole", cap };
 
@@ -47,7 +47,7 @@ int main()
       test.execute( BytesPushed( 2 ) );
     }
     {
-      // Overlapping unassembled section, not resulting in assembly
+
       const size_t cap = { 1000 };
       ReassemblerTestHarness test { "overlapping unassembled section", cap };
 
@@ -60,7 +60,7 @@ int main()
       test.execute( BytesPushed( 0 ) );
     }
     {
-      // Overlapping unassembled section, not resulting in assembly
+
       const size_t cap = { 1000 };
       ReassemblerTestHarness test { "overlapping unassembled section 2", cap };
 
@@ -74,7 +74,7 @@ int main()
     }
 
     {
-      // Overlapping multiple unassembled sections
+
       const size_t cap = { 1000 };
       ReassemblerTestHarness test { "overlapping multiple unassembled sections", cap };
 
@@ -89,7 +89,7 @@ int main()
     }
 
     {
-      // Submission over existing
+
       const size_t cap = { 1000 };
       ReassemblerTestHarness test { "insert over existing section", cap };
 
@@ -107,7 +107,7 @@ int main()
     }
 
     {
-      // Submission within existing
+
       const size_t cap = { 1000 };
       ReassemblerTestHarness test { "insert within existing section", cap };
 
@@ -125,7 +125,7 @@ int main()
     }
 
     {
-      // Hole filled progressively and with overlap. Credit: Sarah McCarthy
+
 
       ReassemblerTestHarness test { "hole filled with overlap", 20 };
 
@@ -144,7 +144,7 @@ int main()
     }
 
     {
-      // Multiple overlap. Credit: Sebastian Ingino
+
       ReassemblerTestHarness test { "multiple overlaps", 1000 };
 
       test.execute( Insert { "c", 2 } );
@@ -165,7 +165,7 @@ int main()
     }
 
     {
-      // Overlap between two pending. Credit: Sebastian Ingino.
+
       ReassemblerTestHarness test { "overlap between two pending", 1000 };
 
       test.execute( Insert { "bc", 1 } );
@@ -186,7 +186,7 @@ int main()
     }
 
     {
-      // Add exact copy. Credit: Sebastian Ingino.
+
       ReassemblerTestHarness test { "exact copy", 1000 };
 
       test.execute( Insert { "b", 1 } );
@@ -206,7 +206,7 @@ int main()
     }
 
     {
-      // Credit: Anonymous (2023)
+
       ReassemblerTestHarness test { "yet another overlap test", 150 };
 
       test.execute( Insert { "efgh", 4 } );
@@ -243,7 +243,7 @@ int main()
     }
 
     {
-      // Credit: Eli Wald
+
       ReassemblerTestHarness test { "small capacity with overlapping insert", 2 };
       test.execute( Insert { "bc", 1 } );
       test.execute( ReadAll( "" ) );
@@ -257,7 +257,7 @@ int main()
     }
 
     {
-      // Credit: Chenhao Li
+
       const size_t cap = { 1000 };
       ReassemblerTestHarness test { "overlapping multiple unassembled sections 2", cap };
 
@@ -274,7 +274,7 @@ int main()
     }
 
     {
-      // Credit: Tanmay Garg
+
       ReassemblerTestHarness test { "overlapping multiple unassembled sections 3", 30 };
 
       test.execute( Insert { "hello", 15 } );

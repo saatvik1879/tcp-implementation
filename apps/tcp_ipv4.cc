@@ -127,7 +127,7 @@ tuple<TCPConfig, FdAdapterConfig, bool, const char*> get_config( const span<char
     }
   }
 
-  // parse positional command-line arguments
+
   if ( listen ) {
     c_filt.source = { "0", args[curr + 1] };
     if ( c_filt.source.port() == 0 ) {
@@ -141,13 +141,13 @@ tuple<TCPConfig, FdAdapterConfig, bool, const char*> get_config( const span<char
 
   return make_tuple( c_fsm, c_filt, listen, tundev );
 }
-} // namespace
+}
 
 int main( int argc, char** argv )
 {
   try {
     if ( argc <= 0 ) {
-      abort(); // For sticklers: don't try to access argv[0] if argc <= 0.
+      abort();
     }
 
     auto args = span( argv, argc );

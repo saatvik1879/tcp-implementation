@@ -11,7 +11,7 @@ using namespace std;
 int main()
 {
   try {
-    // Comparing low-number adjacent seqnos
+
     test_should_be( Wrap32( 3 ) != Wrap32( 1 ), true );
     test_should_be( Wrap32( 3 ) == Wrap32( 1 ), false );
 

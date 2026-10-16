@@ -88,7 +88,7 @@ struct ExpectAcknoBetween : public Expectation<TCPReceiver>
   Wrap32 isn_;
   uint64_t checkpoint_;
   uint64_t min_, max_;
-  ExpectAcknoBetween( Wrap32 isn, uint64_t checkpoint, uint64_t min, uint64_t max ) // NOLINT(*-swappable-*)
+  ExpectAcknoBetween( Wrap32 isn, uint64_t checkpoint, uint64_t min, uint64_t max )
     : isn_( isn ), checkpoint_( checkpoint ), min_( min ), max_( max )
   {}
 

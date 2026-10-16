@@ -24,7 +24,7 @@ inline uint64_t timestamp_ms()
   return std::chrono::steady_clock::now().time_since_epoch().count() / 1000000;
 }
 
-//! \param[in] condition is a function returning true if loop should continue
+
 template<TCPDatagramAdapter AdaptT>
 void TCPMinnowSocket<AdaptT>::_tcp_loop( const std::function<bool()>& condition )
 {
@@ -48,8 +48,8 @@ void TCPMinnowSocket<AdaptT>::_tcp_loop( const std::function<bool()>& condition 
   }
 }
 
-//! \param[in] data_socket_pair is a pair of connected AF_UNIX SOCK_STREAM sockets
-//! \param[in] datagram_interface is the interface for reading and writing datagrams
+
+
 template<TCPDatagramAdapter AdaptT>
 TCPMinnowSocket<AdaptT>::TCPMinnowSocket( std::pair<FileDescriptor, FileDescriptor> data_socket_pair,
                                           AdaptT&& datagram_interface )
@@ -66,21 +66,21 @@ void TCPMinnowSocket<AdaptT>::_initialize_TCP( const TCPConfig& config )
 {
   _tcp.emplace( config );
 
-  // Set up the event loop
 
-  // There are three events to handle:
-  //
-  // 1) Incoming datagram received (needs to be given to TCPPeer::receive method)
-  //
-  // 2) Outbound bytes received from local application via a write()
-  //    call (needs to be read from the local stream socket and
-  //    given to TCPPeer)
-  //
-  // 3) Incoming bytes reassembled by the Reassembler
-  //    (needs to be read from the inbound_stream and written
-  //    to the local stream socket back to the application)
 
-  // rule 1: read from filtered packet stream and dump into TCPConnection
+
+
+
+
+
+
+
+
+
+
+
+
+
   _eventloop.add_rule(
     "receive TCP segment from the network",
     _datagram_adapter.fd(),
@@ -90,7 +90,7 @@ void TCPMinnowSocket<AdaptT>::_initialize_TCP( const TCPConfig& config )
         _tcp->receive( std::move( seg.value() ), [&]( auto x ) { _datagram_adapter.write( x ); } );
       }
 
-      // debugging output:
+
       if ( _thread_data.eof() and _tcp.value().sender().sequence_numbers_in_flight() == 0 and not _fully_acked ) {
         std::cerr << "DEBUG: minnow outbound stream to " << _datagram_adapter.config().destination.to_string()
                   << " has been fully acknowledged.\n";
@@ -99,7 +99,7 @@ void TCPMinnowSocket<AdaptT>::_initialize_TCP( const TCPConfig& config )
     },
     [&] { return _tcp->active(); } );
 
-  // rule 2: read from pipe into outbound buffer
+
   _eventloop.add_rule(
     "push bytes to TCPPeer",
     _thread_data,
@@ -114,7 +114,7 @@ void TCPMinnowSocket<AdaptT>::_initialize_TCP( const TCPConfig& config )
         _tcp->outbound_writer().close();
         _outbound_shutdown = true;
 
-        // debugging output:
+
         std::cerr << "DEBUG: minnow outbound stream to " << _datagram_adapter.config().destination.to_string()
                   << " finished (" << _tcp.value().sender().sequence_numbers_in_flight() << " seqno"
                   << ( _tcp.value().sender().sequence_numbers_in_flight() == 1 ? "" : "s" )
@@ -136,16 +136,16 @@ void TCPMinnowSocket<AdaptT>::_initialize_TCP( const TCPConfig& config )
       _tcp->outbound_writer().set_error();
     } );
 
-  // rule 3: read from inbound buffer into pipe
+
   _eventloop.add_rule(
     "read bytes from inbound stream",
     _thread_data,
     Direction::Out,
     [&] {
       Reader& inbound = _tcp->inbound_reader();
-      // Write from the inbound_stream into
-      // the pipe, handling the possibility of a partial
-      // write (i.e., only pop what was actually written).
+
+
+
       if ( inbound.bytes_buffered() ) {
         const std::string_view buffer = inbound.peek();
         const auto bytes_written = _thread_data.write( buffer );
@@ -156,7 +156,7 @@ void TCPMinnowSocket<AdaptT>::_initialize_TCP( const TCPConfig& config )
         _thread_data.shutdown( SHUT_WR );
         _inbound_shutdown = true;
 
-        // debugging output:
+
         std::cerr << "DEBUG: minnow inbound stream from " << _datagram_adapter.config().destination.to_string()
                   << " finished " << ( inbound.has_error() ? "uncleanly.\n" : "cleanly.\n" );
       }
@@ -173,9 +173,9 @@ void TCPMinnowSocket<AdaptT>::_initialize_TCP( const TCPConfig& config )
     } );
 }
 
-//! \brief Call [socketpair](\ref man2::socketpair) and return connected Unix-domain sockets of specified type
-//! \param[in] type is the type of AF_UNIX sockets to create (e.g., SOCK_SEQPACKET)
-//! \returns a std::pair of connected sockets
+
+
+
 template<std::derived_from<Socket> SocketType>
 inline std::pair<SocketType, SocketType> socket_pair_helper( int domain, int type, int protocol = 0 )
 {
@@ -184,7 +184,7 @@ inline std::pair<SocketType, SocketType> socket_pair_helper( int domain, int typ
   return { SocketType { FileDescriptor { fds[0] } }, SocketType { FileDescriptor { fds[1] } } };
 }
 
-//! \param[in] datagram_interface is the underlying interface (e.g. to UDP, IP, or Ethernet)
+
 template<TCPDatagramAdapter AdaptT>
 TCPMinnowSocket<AdaptT>::TCPMinnowSocket( AdaptT&& datagram_interface )
   : TCPMinnowSocket( socket_pair_helper<LocalStreamSocket>( AF_UNIX, SOCK_STREAM ),
@@ -197,7 +197,7 @@ TCPMinnowSocket<AdaptT>::~TCPMinnowSocket()
   try {
     if ( _tcp_thread.joinable() ) {
       std::cerr << "Warning: unclean shutdown of TCPMinnowSocket\n";
-      // force the other side to exit
+
       _abort.store( true );
       _tcp_thread.join();
     }
@@ -217,8 +217,8 @@ void TCPMinnowSocket<AdaptT>::wait_until_closed()
   }
 }
 
-//! \param[in] c_tcp is the TCPConfig for the TCPConnection
-//! \param[in] c_ad is the FdAdapterConfig for the FdAdapter
+
+
 template<TCPDatagramAdapter AdaptT>
 void TCPMinnowSocket<AdaptT>::connect( const TCPConfig& c_tcp, const FdAdapterConfig& c_ad )
 {
@@ -252,8 +252,8 @@ void TCPMinnowSocket<AdaptT>::connect( const TCPConfig& c_tcp, const FdAdapterCo
   _tcp_thread = std::thread( &TCPMinnowSocket::_tcp_main, this );
 }
 
-//! \param[in] c_tcp is the TCPConfig for the TCPConnection
-//! \param[in] c_ad is the FdAdapterConfig for the FdAdapter
+
+
 template<TCPDatagramAdapter AdaptT>
 void TCPMinnowSocket<AdaptT>::listen_and_accept( const TCPConfig& c_tcp, const FdAdapterConfig& c_ad )
 {

@@ -56,7 +56,7 @@ int main()
       test.execute( ReadAll { "abcdefgh" } );
     }
 
-    // Many (arrive/read)s
+
     {
       TCPReceiverTestHarness test { "transmit 4", 4000 };
       const uint32_t max_block_size = 10;
@@ -79,7 +79,7 @@ int main()
       }
     }
 
-    // Many arrives, one read
+
     {
       const uint64_t max_block_size = 10;
       const uint64_t n_rounds = 100;

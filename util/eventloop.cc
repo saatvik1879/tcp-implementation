@@ -44,7 +44,7 @@ EventLoop::RuleHandle EventLoop::add_rule( size_t category_id,
                                            Direction direction,
                                            const CallbackT& callback,
                                            const InterestT& interest,
-                                           const CallbackT& cancel, // NOLINT(*-easily-swappable-*)
+                                           const CallbackT& cancel,
                                            const CallbackT& error )
 {
   if ( category_id >= _rule_categories.size() ) {
@@ -78,11 +78,11 @@ void EventLoop::RuleHandle::cancel()
   }
 }
 
-// NOLINTBEGIN(*-cognitive-complexity)
-// NOLINTBEGIN(*-signed-bitwise)
+
+
 EventLoop::Result EventLoop::wait_next_event( const int timeout_ms )
 {
-  // first, handle the non-file-descriptor-related rules
+
   {
     for ( auto it = _non_fd_rules.begin(); it != _non_fd_rules.end(); ) {
       auto& this_rule = **it;
@@ -106,32 +106,32 @@ EventLoop::Result EventLoop::wait_next_event( const int timeout_ms )
       }
 
       if ( rule_fired ) {
-        return Result::Success; /* only serve one rule on each iteration */
+        return Result::Success;
       }
 
       ++it;
     }
   }
 
-  // now the file-descriptor-related rules. poll any "interested" file descriptors
+
   vector<pollfd> pollfds {};
   pollfds.reserve( _fd_rules.size() );
   bool something_to_poll = false;
 
-  // set up the pollfd for each rule
-  for ( auto it = _fd_rules.begin(); it != _fd_rules.end(); ) { // NOTE: it gets erased or incremented in loop body
+
+  for ( auto it = _fd_rules.begin(); it != _fd_rules.end(); ) {
     auto& this_rule = **it;
 
     if ( this_rule.cancel_requested ) {
-      //      this_rule.cancel();
-      //      if rule is cancelled externally, no need to call the cancellation callback
-      //      this makes it easier to cancel rules and delete captured objects right away
+
+
+
       it = _fd_rules.erase( it );
       continue;
     }
 
     if ( this_rule.direction == Direction::In && this_rule.fd.eof() ) {
-      // no more reading on this rule, it's reached eof
+
       this_rule.cancel();
       it = _fd_rules.erase( it );
       continue;
@@ -147,29 +147,29 @@ EventLoop::Result EventLoop::wait_next_event( const int timeout_ms )
       pollfds.push_back( { this_rule.fd.fd_num(), static_cast<int16_t>( this_rule.direction ), 0 } );
       something_to_poll = true;
     } else {
-      pollfds.push_back( { this_rule.fd.fd_num(), 0, 0 } ); // placeholder --- we still want errors
+      pollfds.push_back( { this_rule.fd.fd_num(), 0, 0 } );
     }
     ++it;
   }
 
-  // quit if there is nothing left to poll
+
   if ( not something_to_poll ) {
     return Result::Exit;
   }
 
-  // call poll -- wait until one of the fds satisfies one of the rules (writeable/readable)
+
   if ( 0 == CheckSystemCall( "poll", ::poll( pollfds.data(), pollfds.size(), timeout_ms ) ) ) {
     return Result::Timeout;
   }
 
-  // go through the poll results
+
   for ( auto [it, idx] = make_pair( _fd_rules.begin(), static_cast<size_t>( 0 ) ); it != _fd_rules.end(); ++idx ) {
     const auto& this_pollfd = pollfds.at( idx );
     auto& this_rule = **it;
 
     const auto poll_error = static_cast<bool>( this_pollfd.revents & ( POLLERR | POLLNVAL ) );
     if ( poll_error ) {
-      /* see if fd is a socket */
+
       int socket_error = 0;
       socklen_t optlen = sizeof( socket_error );
       const int ret = getsockopt( this_rule.fd.fd_num(), SOL_SOCKET, SO_ERROR, &socket_error, &optlen );
@@ -194,17 +194,17 @@ EventLoop::Result EventLoop::wait_next_event( const int timeout_ms )
     const auto poll_ready = static_cast<bool>( this_pollfd.revents & this_pollfd.events );
     const auto poll_hup = static_cast<bool>( this_pollfd.revents & POLLHUP );
     if ( poll_hup && ( ( this_pollfd.events && !poll_ready ) or ( this_rule.direction == Direction::Out ) ) ) {
-      // if we asked for the status, and the _only_ condition was a hangup, this FD is defunct:
-      //   - if it was POLLIN and nothing is readable, no more will ever be readable
-      //   - if it was POLLOUT, it will not be writable again
-      // additionally, consider FD defunct if rule will only query for Direction::Out
+
+
+
+
       this_rule.cancel();
       it = _fd_rules.erase( it );
       continue;
     }
 
     if ( poll_ready ) {
-      // we only want to call callback if revents includes the event we asked for
+
       const auto count_before = this_rule.service_count();
       this_rule.callback();
 
@@ -214,13 +214,11 @@ EventLoop::Result EventLoop::wait_next_event( const int timeout_ms )
                              + "\" did not read/write fd and is still interested" );
       }
 
-      return Result::Success; /* only serve one rule on each iteration */
+      return Result::Success;
     }
 
-    ++it; // if we got here, it means we didn't call _fd_rules.erase()
+    ++it;
   }
 
   return Result::Success;
 }
-// NOLINTEND(*-signed-bitwise)
-// NOLINTEND(*-cognitive-complexity)

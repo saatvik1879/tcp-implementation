@@ -97,7 +97,7 @@ int main()
       test.execute( Push { "1234567" } );
       test.execute( Close {} );
       test.execute( ExpectMessage {}.with_no_flags().with_data( "1234567" ) );
-      test.execute( ExpectNoSegment {} ); // window is full
+      test.execute( ExpectNoSegment {} );
       test.execute( AckReceived { Wrap32 { isn + 8 } }.with_win( 1 ) );
       test.execute( ExpectMessage {}.with_fin( true ).with_data( "" ) );
       test.execute( ExpectNoSegment {} );
@@ -116,7 +116,7 @@ int main()
       test.execute( Push { "1234567" } );
       test.execute( Close {} );
       test.execute( ExpectMessage {}.with_no_flags().with_data( "1234567" ) );
-      test.execute( ExpectNoSegment {} ); // window is full
+      test.execute( ExpectNoSegment {} );
       test.execute( AckReceived { Wrap32 { isn + 1 } }.with_win( 8 ) );
       test.execute( ExpectMessage {}.with_fin( true ).with_data( "" ) );
       test.execute( ExpectNoSegment {} );
@@ -135,7 +135,7 @@ int main()
       test.execute( Push { "1234567" } );
       test.execute( Close {} );
       test.execute( ExpectMessage {}.with_no_flags().with_data( "123" ) );
-      test.execute( ExpectNoSegment {} ); // window is full
+      test.execute( ExpectNoSegment {} );
       test.execute( AckReceived { Wrap32 { isn + 1 } }.with_win( 8 ) );
       test.execute( ExpectMessage {}.with_fin( true ).with_data( "4567" ) );
       test.execute( ExpectNoSegment {} );

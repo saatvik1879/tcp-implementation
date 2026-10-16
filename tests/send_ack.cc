@@ -57,7 +57,7 @@ int main()
       test.execute( HasError { false } );
     }
 
-    // credit for test: Jared Wasserman (2020)
+
     {
       TCPConfig cfg;
       const Wrap32 isn( rd() );
@@ -72,9 +72,9 @@ int main()
       test.execute( HasError { false } );
     }
 
-    // disable controversial test for 2024
+
 #if 0
-    // test credit: Ammar Ratnani
+
     {
       TCPConfig cfg;
       const Wrap32 isn( rd() );

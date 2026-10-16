@@ -25,7 +25,7 @@ void bidirectional_stream_copy( Socket& socket, string_view peer_name )
   _input.set_blocking( false );
   _output.set_blocking( false );
 
-  // rule 1: read from stdin into outbound byte stream
+
   _eventloop.add_rule(
     "read from stdin into outbound byte stream",
     _input,
@@ -50,7 +50,7 @@ void bidirectional_stream_copy( Socket& socket, string_view peer_name )
       _inbound.set_error();
     } );
 
-  // rule 2: read from outbound byte stream into socket
+
   _eventloop.add_rule(
     "read from outbound byte stream into socket",
     socket,
@@ -75,7 +75,7 @@ void bidirectional_stream_copy( Socket& socket, string_view peer_name )
       _inbound.set_error();
     } );
 
-  // rule 3: read from socket into inbound byte stream
+
   _eventloop.add_rule(
     "read from socket into inbound byte stream",
     socket,
@@ -100,7 +100,7 @@ void bidirectional_stream_copy( Socket& socket, string_view peer_name )
       _inbound.set_error();
     } );
 
-  // rule 4: read from inbound byte stream into stdout
+
   _eventloop.add_rule(
     "read from inbound byte stream into stdout",
     _output,
@@ -126,7 +126,7 @@ void bidirectional_stream_copy( Socket& socket, string_view peer_name )
       _inbound.set_error();
     } );
 
-  // loop until completion
+
   while ( true ) {
     if ( EventLoop::Result::Exit == _eventloop.wait_next_event( -1 ) ) {
       return;

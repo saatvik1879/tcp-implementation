@@ -6,7 +6,7 @@
 
 #include <optional>
 
-//! \brief A converter from TCP segments to serialized IPv4 datagrams
+
 class TCPOverIPv4Adapter : public FdAdapterBase
 {
 public:

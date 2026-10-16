@@ -5,7 +5,7 @@
 
 using namespace std;
 
-//! \returns A string with a textual representation of an Ethernet address
+
 string to_string( const EthernetAddress address )
 {
   stringstream ss {};
@@ -19,7 +19,7 @@ string to_string( const EthernetAddress address )
   return ss.str();
 }
 
-//! \returns A string with the header's contents
+
 string EthernetHeader::to_string() const
 {
   stringstream ss {};
@@ -43,32 +43,32 @@ string EthernetHeader::to_string() const
 
 void EthernetHeader::parse( Parser& parser )
 {
-  // read destination address
+
   for ( auto& b : dst ) {
     parser.integer( b );
   }
 
-  // read source address
+
   for ( auto& b : src ) {
     parser.integer( b );
   }
 
-  // read frame type (e.g. IPv4, ARP, or something else)
+
   parser.integer( type );
 }
 
 void EthernetHeader::serialize( Serializer& serializer ) const
 {
-  // write destination address
+
   for ( const auto& b : dst ) {
     serializer.integer( b );
   }
 
-  // write source address
+
   for ( const auto& b : src ) {
     serializer.integer( b );
   }
 
-  // write frame type (e.g. IPv4, ARP, or something else)
+
   serializer.integer( type );
 }

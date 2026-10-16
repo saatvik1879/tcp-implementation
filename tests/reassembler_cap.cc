@@ -97,7 +97,7 @@ int main()
       test.execute( ReadAll( "c" ) );
     }
 
-    // test credit: Cooper de Nicola
+
     {
       ReassemblerTestHarness test { "insert last beyond capacity", 2 };
 
@@ -121,7 +121,7 @@ int main()
       test.execute( IsFinished { true } );
     }
 
-    // test credit: Tanmay Garg and Agam Mohan Singh Bhatia
+
     {
       ReassemblerTestHarness test { "insert last fully beyond capacity + empty string is last", 2 };
 

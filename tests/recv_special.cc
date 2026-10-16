@@ -14,7 +14,7 @@ int main()
   try {
     auto rd = get_random_engine();
 
-    /* segment before SYN */
+
     {
       const uint32_t isn = uniform_int_distribution<uint32_t> { 0, UINT32_MAX }( rd );
       TCPReceiverTestHarness test { "segment before SYN", 4000 };
@@ -30,7 +30,7 @@ int main()
       test.execute( ExpectAckno { Wrap32 { isn + 1 } } );
     }
 
-    /* segment with SYN + data */
+
     {
       const uint32_t isn = uniform_int_distribution<uint32_t> { 0, UINT32_MAX }( rd );
       TCPReceiverTestHarness test { "segment with SYN + data", 4000 };
@@ -42,7 +42,7 @@ int main()
       test.execute( IsClosed { false } );
     }
 
-    /* empty segment */
+
     {
       const uint32_t isn = uniform_int_distribution<uint32_t> { 0, UINT32_MAX }( rd );
       TCPReceiverTestHarness test { "empty segment", 4000 };
@@ -60,7 +60,7 @@ int main()
       test.execute( IsClosed { false } );
     }
 
-    /* segment with null byte */
+
     {
       const uint32_t isn = uniform_int_distribution<uint32_t> { 0, UINT32_MAX }( rd );
       TCPReceiverTestHarness test { "segment with null byte", 4000 };
@@ -75,7 +75,7 @@ int main()
       test.execute( IsClosed { false } );
     }
 
-    /* segment with data + FIN */
+
     {
       const uint32_t isn = uniform_int_distribution<uint32_t> { 0, UINT32_MAX }( rd );
       TCPReceiverTestHarness test { "segment with data + FIN", 4000 };
@@ -88,7 +88,7 @@ int main()
       test.execute( IsFinished { true } );
     }
 
-    /* segment with FIN (but can't be assembled yet) */
+
     {
       const uint32_t isn = uniform_int_distribution<uint32_t> { 0, UINT32_MAX }( rd );
       TCPReceiverTestHarness test { "segment with FIN (but can't be assembled yet)", 4000 };
@@ -105,7 +105,7 @@ int main()
       test.execute( IsFinished { true } );
     }
 
-    /* segment with SYN + data + FIN */
+
     {
       const uint32_t isn = uniform_int_distribution<uint32_t> { 0, UINT32_MAX }( rd );
       TCPReceiverTestHarness test { "segment with SYN + payload + FIN", 4000 };
@@ -119,7 +119,7 @@ int main()
       test.execute( IsFinished { true } );
     }
 
-    // credit: Mustafa Bayramov
+
     {
       const size_t cap = 10;
       const uint32_t isn = 23452;
@@ -135,7 +135,7 @@ int main()
       test.execute( ExpectAckno { Wrap32 { isn + 11 } } );
       test.execute( ExpectWindow { 0 } );
       test.execute( BytesPushed { 10 } );
-      // buffer we keep pushing
+
       test.execute( SegmentArrives {}.with_seqno( isn + 11 ).with_data( "klmno" ) );
       test.execute( ExpectAckno { Wrap32 { isn + 11 } } );
       test.execute( ExpectWindow { 0 } );
@@ -194,14 +194,14 @@ int main()
     }
 
     {
-      // The spec is more restrictive on RST acceptance; we use simpler logic in CS144.
+
       TCPReceiverTestHarness test { "RST flag set -> stream error", 10 };
       test.execute( SegmentArrives {}.with_seqno( rd() ).with_rst().without_ackno() );
       test.execute( HasError { true } );
     }
 
     {
-      // test credit: Majd Nasra
+
       ReassemblerTestHarness test { "segment already seen in full", 3 };
 
       test.execute( Insert { "abc", 0 } );
@@ -209,13 +209,13 @@ int main()
       test.execute( BytesPushed( 3 ) );
       test.execute( BytesPending( 0 ) );
       test.execute( Insert { "ab", 0 } );
-      test.execute( ReadAll( "" ) ); // tests if the code double-pushes segments already seen in the stream.
+      test.execute( ReadAll( "" ) );
       test.execute( BytesPushed( 3 ) );
       test.execute( BytesPending( 0 ) );
     }
 
     {
-      // Credit: Max Jardetzky
+
       ReassemblerTestHarness test { "insert within capacity", 4 };
 
       test.execute( Insert { "bc", 1 } );
@@ -231,7 +231,7 @@ int main()
       test.execute( BytesPending( 0 ) );
     }
 
-    // test credit: Tanmay Garg and Agam Mohan Singh Bhatia
+
     {
       ReassemblerTestHarness test { "insert last fully beyond capacity + empty string is last", 2 };
 

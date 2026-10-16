@@ -23,7 +23,7 @@ public:
   size_t peek_size() { return object().reader().peek().size(); }
 };
 
-/* actions */
+
 
 struct Push : public Action<ByteStream>
 {
@@ -55,7 +55,7 @@ struct Pop : public Action<ByteStream>
   void execute( ByteStream& bs ) const override { bs.reader().pop( len_ ); }
 };
 
-/* expectations */
+
 
 struct Peek : public Expectation<ByteStream>
 {

@@ -13,15 +13,15 @@ EthernetAddress random_private_ethernet_address()
 {
   EthernetAddress addr;
   for ( auto& byte : addr ) {
-    byte = random_device()(); // use a random local Ethernet address
+    byte = random_device()();
   }
-  addr.at( 0 ) |= 0x02; // "10" in last two binary digits marks a private Ethernet address
+  addr.at( 0 ) |= 0x02;
   addr.at( 0 ) &= 0xfe;
 
   return addr;
 }
 
-InternetDatagram make_datagram( const string& src_ip, const string& dst_ip ) // NOLINT(*-swappable-*)
+InternetDatagram make_datagram( const string& src_ip, const string& dst_ip )
 {
   InternetDatagram dgram;
   dgram.header.src = Address( src_ip, 0 ).ipv4_numeric();
@@ -70,7 +70,7 @@ int main()
       const auto datagram = make_datagram( "5.6.7.8", "13.12.11.10" );
       test.execute( SendDatagram { datagram, Address( "192.168.0.1", 0 ) } );
 
-      // outgoing datagram should result in an ARP request
+
       test.execute( ExpectFrame { make_frame(
         local_eth,
         ETHERNET_BROADCAST,
@@ -82,12 +82,12 @@ int main()
       test.execute( Tick { 800 } );
       test.execute( ExpectNoFrame {} );
 
-      // ARP reply should result in the queued datagram getting sent
+
       test.execute( ReceiveFrame {
         make_frame(
           target_eth,
           local_eth,
-          EthernetHeader::TYPE_ARP, // NOLINTNEXTLINE(*-suspicious-*)
+          EthernetHeader::TYPE_ARP,
           serialize( make_arp( ARPMessage::OPCODE_REPLY, target_eth, "192.168.0.1", local_eth, "4.3.2.1" ) ) ),
         {} } );
 
@@ -95,14 +95,14 @@ int main()
         ExpectFrame { make_frame( local_eth, target_eth, EthernetHeader::TYPE_IPv4, serialize( datagram ) ) } );
       test.execute( ExpectNoFrame {} );
 
-      // any IP reply directed for our Ethernet address should be passed up the stack
+
       const auto reply_datagram = make_datagram( "13.12.11.10", "5.6.7.8" );
       test.execute(
         ReceiveFrame( make_frame( target_eth, local_eth, EthernetHeader::TYPE_IPv4, serialize( reply_datagram ) ),
                       reply_datagram ) );
       test.execute( ExpectNoFrame {} );
 
-      // incoming frames to another Ethernet address (not ours) should be ignored
+
       const EthernetAddress another_eth = { 1, 1, 1, 1, 1, 1 };
       test.execute( ReceiveFrame(
         make_frame( target_eth, another_eth, EthernetHeader::TYPE_IPv4, serialize( reply_datagram ) ), {} ) );
@@ -172,7 +172,7 @@ int main()
       test.execute( SendDatagram { make_datagram( "17.17.17.17", "18.18.18.18" ), Address( "10.0.0.1", 0 ) } );
       test.execute( ExpectNoFrame {} );
       test.execute( Tick { 20 } );
-      // pending mapping should now expire
+
       test.execute( SendDatagram { make_datagram( "42.41.40.39", "13.12.11.10" ), Address( "10.0.0.1", 0 ) } );
       test.execute( ExpectFrame {
         make_frame( local_eth,
@@ -202,7 +202,7 @@ int main()
         make_frame(
           target_eth,
           local_eth,
-          EthernetHeader::TYPE_ARP, // NOLINTNEXTLINE(*-suspicious-*)
+          EthernetHeader::TYPE_ARP,
           serialize( make_arp( ARPMessage::OPCODE_REPLY, target_eth, "192.168.0.1", local_eth, "4.3.2.1" ) ) ),
         {} } );
 
@@ -210,21 +210,21 @@ int main()
         ExpectFrame { make_frame( local_eth, target_eth, EthernetHeader::TYPE_IPv4, serialize( datagram ) ) } );
       test.execute( ExpectNoFrame {} );
 
-      // try after 10 seconds -- no ARP should be generated
+
       test.execute( Tick { 10000 } );
       test.execute( SendDatagram { datagram2, Address( "192.168.0.1", 0 ) } );
       test.execute(
         ExpectFrame { make_frame( local_eth, target_eth, EthernetHeader::TYPE_IPv4, serialize( datagram2 ) ) } );
       test.execute( ExpectNoFrame {} );
 
-      // another 10 seconds -- no ARP should be generated
+
       test.execute( Tick { 10000 } );
       test.execute( SendDatagram { datagram3, Address( "192.168.0.1", 0 ) } );
       test.execute(
         ExpectFrame { make_frame( local_eth, target_eth, EthernetHeader::TYPE_IPv4, serialize( datagram3 ) ) } );
       test.execute( ExpectNoFrame {} );
 
-      // after another 11 seconds, need to ARP again
+
       test.execute( Tick { 11000 } );
       test.execute( SendDatagram { datagram4, Address( "192.168.0.1", 0 ) } );
       test.execute( ExpectFrame { make_frame(
@@ -234,7 +234,7 @@ int main()
         serialize( make_arp( ARPMessage::OPCODE_REQUEST, local_eth, "4.3.2.1", {}, "192.168.0.1" ) ) ) } );
       test.execute( ExpectNoFrame {} );
 
-      // ARP reply again
+
       const EthernetAddress new_target_eth = random_private_ethernet_address();
       test.execute( ReceiveFrame {
         make_frame(
@@ -255,7 +255,7 @@ int main()
       NetworkInterfaceTestHarness test {
         "different ARP mappings are independent", local_eth, Address( "10.0.0.1", 0 ) };
 
-      // first ARP mapping
+
       test.execute( ReceiveFrame {
         make_frame( remote_eth1,
                     ETHERNET_BROADCAST,
@@ -271,7 +271,7 @@ int main()
 
       test.execute( Tick { 15000 } );
 
-      // second ARP mapping
+
       test.execute( ReceiveFrame {
         make_frame( remote_eth2,
                     ETHERNET_BROADCAST,
@@ -287,11 +287,11 @@ int main()
 
       test.execute( Tick { 10000 } );
 
-      // outgoing datagram to first destination
+
       const auto datagram = make_datagram( "5.6.7.8", "13.12.11.10" );
       test.execute( SendDatagram { datagram, Address( "10.0.0.5", 0 ) } );
 
-      // outgoing datagram to second destination
+
       const auto datagram2 = make_datagram( "100.99.98.97", "4.10.4.10" );
       test.execute( SendDatagram { datagram2, Address( "10.0.0.19", 0 ) } );
 
@@ -303,14 +303,14 @@ int main()
 
       test.execute( Tick { 5010 } );
 
-      // outgoing datagram to second destination (mapping still alive)
+
       const auto datagram3 = make_datagram( "150.140.130.120", "144.144.144.144" );
       test.execute( SendDatagram { datagram3, Address( "10.0.0.19", 0 ) } );
       test.execute(
         ExpectFrame { make_frame( local_eth, remote_eth2, EthernetHeader::TYPE_IPv4, serialize( datagram3 ) ) } );
       test.execute( ExpectNoFrame {} );
 
-      // outgoing datagram to second destination (mapping has expired)
+
       const auto datagram4 = make_datagram( "244.244.244.244", "3.3.3.3" );
       test.execute( SendDatagram { datagram4, Address( "10.0.0.5", 0 ) } );
       test.execute( ExpectFrame { make_frame(

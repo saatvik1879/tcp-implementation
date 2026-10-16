@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-// Small struct to represent "user datagram" information (UDP, or the "UDP-like" portion of a TCP header)
+
 
 struct UserDatagramInfo
 {

@@ -43,13 +43,13 @@ void ARPMessage::parse( Parser& parser )
     return;
   }
 
-  // read sender addresses (Ethernet and IP)
+
   for ( auto& b : sender_ethernet_address ) {
     parser.integer( b );
   }
   parser.integer( sender_ip_address );
 
-  // read target addresses (Ethernet and IP)
+
   for ( auto& b : target_ethernet_address ) {
     parser.integer( b );
   }
@@ -68,13 +68,13 @@ void ARPMessage::serialize( Serializer& serializer ) const
   serializer.integer( protocol_address_size );
   serializer.integer( opcode );
 
-  // read sender addresses (Ethernet and IP)
+
   for ( const auto& b : sender_ethernet_address ) {
     serializer.integer( b );
   }
   serializer.integer( sender_ip_address );
 
-  // read target addresses (Ethernet and IP)
+
   for ( const auto& b : target_ethernet_address ) {
     serializer.integer( b );
   }

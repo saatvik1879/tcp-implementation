@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-//! The internet checksum algorithm
+
 class InternetChecksum
 {
 private:

@@ -3,10 +3,7 @@
 #include <cstdint>
 #include <stdexcept>
 
-/*
- * read: A helper function thats peeks and pops up to `len` bytes
- * from a ByteStream Reader into a string;
- */
+
 void read( Reader& reader, uint64_t len, std::string& out )
 {
   out.clear();
@@ -18,7 +15,7 @@ void read( Reader& reader, uint64_t len, std::string& out )
       throw std::runtime_error( "Reader::peek() returned empty string_view" );
     }
 
-    view = view.substr( 0, len - out.size() ); // Don't return more bytes than desired.
+    view = view.substr( 0, len - out.size() );
     out += view;
     reader.pop( view.size() );
   }
@@ -29,7 +26,7 @@ Reader& ByteStream::reader()
   static_assert( sizeof( Reader ) == sizeof( ByteStream ),
                  "Please add member variables to the ByteStream base, not the ByteStream Reader." );
 
-  return static_cast<Reader&>( *this ); // NOLINT(*-downcast)
+  return static_cast<Reader&>( *this );
 }
 
 const Reader& ByteStream::reader() const
@@ -37,7 +34,7 @@ const Reader& ByteStream::reader() const
   static_assert( sizeof( Reader ) == sizeof( ByteStream ),
                  "Please add member variables to the ByteStream base, not the ByteStream Reader." );
 
-  return static_cast<const Reader&>( *this ); // NOLINT(*-downcast)
+  return static_cast<const Reader&>( *this );
 }
 
 Writer& ByteStream::writer()
@@ -45,7 +42,7 @@ Writer& ByteStream::writer()
   static_assert( sizeof( Writer ) == sizeof( ByteStream ),
                  "Please add member variables to the ByteStream base, not the ByteStream Writer." );
 
-  return static_cast<Writer&>( *this ); // NOLINT(*-downcast)
+  return static_cast<Writer&>( *this );
 }
 
 const Writer& ByteStream::writer() const
@@ -53,5 +50,5 @@ const Writer& ByteStream::writer() const
   static_assert( sizeof( Writer ) == sizeof( ByteStream ),
                  "Please add member variables to the ByteStream base, not the ByteStream Writer." );
 
-  return static_cast<const Writer&>( *this ); // NOLINT(*-downcast)
+  return static_cast<const Writer&>( *this );
 }

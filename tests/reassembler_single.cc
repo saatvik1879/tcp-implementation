@@ -63,7 +63,7 @@ int main()
       test.execute( IsFinished { false } );
     }
 
-    // credit: Joshua Dong
+
     {
       ReassemblerTestHarness test { "insert a after 'first unacceptable'", 1 };
 

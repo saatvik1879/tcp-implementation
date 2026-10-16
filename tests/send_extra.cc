@@ -493,7 +493,7 @@ int main()
       test.execute( ExpectSeqnosInFlight { 0 } );
     }
 
-    // test credit: DD152
+
     {
       TCPConfig cfg;
       const Wrap32 isn( rd() );
@@ -503,7 +503,7 @@ int main()
       for ( unsigned int i = 0; i < TCPConfig::DEFAULT_CAPACITY; i++ ) {
         bigstring.push_back( nicechars.at( rd() % nicechars.size() ) );
       }
-      // max window size
+
       const size_t window_size = 65535;
       TCPSenderTestHarness test { "Only the last segment has FIN", cfg };
       test.execute( Push {} );
@@ -536,7 +536,7 @@ int main()
       test.execute( ExpectSeqno { isn + 2 + bigstring.size() } );
     }
 
-    // Sender must set RST iff stream has suffered an error
+
     {
       TCPConfig cfg;
       const Wrap32 isn( rd() );
@@ -548,7 +548,7 @@ int main()
       test.execute( ExpectReset { true } );
     }
 
-    // Sender must set RST iff stream has suffered an error
+
     {
       TCPConfig cfg;
       const Wrap32 isn( rd() );
@@ -572,7 +572,7 @@ int main()
       test.execute( HasError { true } );
     }
 
-    // Newly added test: check RTO timer on invalid ackno
+
     {
       TCPConfig cfg;
       const Wrap32 isn( rd() );
@@ -586,15 +586,15 @@ int main()
       test.execute( Push { "abcd" } );
       test.execute( ExpectMessage {}.with_payload_size( 4 ) );
       test.execute( ExpectNoSegment {} );
-      test.execute( Tick { 10 }.with_max_retx_exceeded( false ) ); // RTO timer should double here
+      test.execute( Tick { 10 }.with_max_retx_exceeded( false ) );
       test.execute( ExpectMessage {}.with_payload_size( 4 ) );
       test.execute( ExpectNoSegment {} );
-      test.execute( AckReceived { Wrap32 { isn + 1000 } } );       // invalid ackno received here, should not reset
-      test.execute( Tick { 10 }.with_max_retx_exceeded( false ) ); // RTO timer should still be double
+      test.execute( AckReceived { Wrap32 { isn + 1000 } } );
+      test.execute( Tick { 10 }.with_max_retx_exceeded( false ) );
       test.execute( ExpectNoSegment {} );
     }
 
-    // test credit: Ava Jih-Schiff
+
     {
       TCPConfig cfg;
       const Wrap32 isn( rd() );
@@ -602,7 +602,7 @@ int main()
 
       TCPSenderTestHarness test { "Receiving before transmit I", cfg };
       test.execute(
-        AckReceived { Wrap32 { cfg.isn } }.with_win( 3 ).without_push() ); // invalid ack but window is set
+        AckReceived { Wrap32 { cfg.isn } }.with_win( 3 ).without_push() );
       test.execute( ExpectNoSegment {} );
       test.execute( Push { "abc" }.with_close() );
       test.execute( ExpectMessage {}.with_no_flags().with_syn( true ).with_payload_size( 2 ).with_seqno( isn ) );
@@ -615,7 +615,7 @@ int main()
         ExpectMessage {}.with_no_flags().with_fin( true ).with_payload_size( 0 ).with_seqno( isn + 4 ) );
     }
 
-    // test credit: Majd Nasra
+
     {
       TCPConfig cfg;
       const Wrap32 isn( rd() );
@@ -639,7 +639,7 @@ int main()
       test.execute( ExpectMessage {}.with_data( "abc" ) );
     }
 
-    // test credit: Majd Nasra
+
     {
       TCPConfig cfg;
       const Wrap32 isn( rd() );
@@ -655,14 +655,14 @@ int main()
       test.execute( HasError { false } );
     }
 
-    // test credit: Sasha Moore
+
     {
       TCPConfig cfg;
       const Wrap32 isn( rd() );
       cfg.isn = isn;
 
       TCPSenderTestHarness test { "Receiving before transmit III", cfg };
-      //  Set window size without having sent an acknowledgment
+
       test.execute( Receive { { {}, 1024 } }.without_push() );
       test.execute( ExpectNoSegment {} );
       test.execute( Close {} );

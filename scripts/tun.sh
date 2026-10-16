@@ -14,7 +14,7 @@ start_tun () {
     ip link set dev "${TUNDEV}" up
     ip route change "${TUN_IP_PREFIX}.${TUNNUM}.0/24" dev "${TUNDEV}" rto_min 10ms
 
-    # Apply NAT (masquerading) only to traffic from CS144's network devices
+
     iptables -t nat -A PREROUTING -s ${TUN_IP_PREFIX}.${TUNNUM}.0/24 -j CONNMARK --set-mark ${TUNNUM}
     iptables -t nat -A POSTROUTING -j MASQUERADE -m connmark --mark ${TUNNUM}
     echo 1 > /proc/sys/net/ipv4/ip_forward
@@ -49,7 +49,7 @@ restart_all() {
 check_tun () {
     [ "$#" != 1 ] && { echo "bad params in check_tun"; exit 1; }
     local TUNDEV="tun${1}"
-    # make sure tun is healthy: device is up, ip_forward is set, and iptables is configured
+
     ip link show ${TUNDEV} &>/dev/null || return 1
     [ "$(cat /proc/sys/net/ipv4/ip_forward)" = "1" ] || return 2
 }
@@ -60,24 +60,24 @@ check_sudo () {
         exit 1
     fi
     if [ -z "$SUDO_USER" ]; then
-        # if the user didn't call us with sudo, re-execute
+
         exec sudo $0 "$MODE" "$@"
     fi
 }
 
-# check arguments
+
 if [ -z "$1" ] || ([ "$1" != "start" ] && [ "$1" != "stop" ] && [ "$1" != "restart" ] && [ "$1" != "check" ]); then
     show_usage
 fi
 MODE=$1; shift
 
-# set default argument
+
 if [ "$#" = "0" ]; then
     set -- 144 145
 fi
 
-# execute 'check' before trying to sudo
-# - like start, but exit successfully if everything is OK
+
+
 if [ "$MODE" = "check" ]; then
     declare -a INTFS
     MODE="start"
@@ -95,7 +95,7 @@ if [ "$MODE" = "check" ]; then
         INTFS+=($INTF)
     done
 
-    # address only the interfaces that need it
+
     set -- "${INTFS[@]}"
     if [ "$#" = "0" ]; then
         exit 0
@@ -103,8 +103,8 @@ if [ "$MODE" = "check" ]; then
     echo -e "[$0] Bringing up tunnels ${INTFS[@]}:"
 fi
 
-# sudo if necessary
+
 check_sudo "$@"
 
-# start, stop, or restart all intfs
+
 eval "${MODE}_all" "$@"

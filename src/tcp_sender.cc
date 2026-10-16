@@ -21,7 +21,7 @@ void TCPSender::push( const TransmitFunction& transmit )
 {
   while ( ( window_size_ == 0 ? 1 : window_size_ ) > total_outstanding_ ) {
     if ( FIN_sent_ ) {
-      break; // Is finished.
+      break;
     }
 
     auto msg { make_empty_message() };
@@ -86,7 +86,7 @@ void TCPSender::receive( const TCPReceiverMessage& msg )
   while ( not outstanding_message_.empty() ) {
     const auto& message { outstanding_message_.front() };
     if ( ack_abs_seqno_ + message.sequence_length() > recv_ack_abs_seqno ) {
-      break; // Must be fully acknowledged by the TCP receiver.
+      break;
     }
     has_acknowledgment = true;
     ack_abs_seqno_ += message.sequence_length();

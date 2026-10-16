@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <string>
 
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage))
+
 #define test_should_be( act, exp ) test_should_be_helper( act, exp, #act, #exp, __LINE__ )
 
 template<typename T>

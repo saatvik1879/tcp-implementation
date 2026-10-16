@@ -219,7 +219,7 @@ public:
   }
 };
 
-// Helper to serialize any object (without constructing a Serializer of the caller's own)
+
 template<class T>
 std::vector<std::string> serialize( const T& obj )
 {
@@ -228,7 +228,7 @@ std::vector<std::string> serialize( const T& obj )
   return s.output();
 }
 
-// Helper to parse any object (without constructing a Parser of the caller's own). Returns true if successful.
+
 template<class T, typename... Targs>
 bool parse( T& obj, const std::vector<std::string>& buffers, Targs&&... Fargs )
 {
